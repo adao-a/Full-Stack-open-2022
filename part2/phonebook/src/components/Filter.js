@@ -4,7 +4,7 @@ const Filter = ({persons, setPersons}) => {
     const filterPerson = (event) => {
         const copyPerson = persons.filter((person) => {
           console.log('person.name', person.name)
-          return person.name === event.target.value
+          return person.name.startsWith(event.target.value)
         })
         setPersons(copyPerson)
         console.log('copyPerson', copyPerson)
