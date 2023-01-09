@@ -1,25 +1,50 @@
-import React from "react";
+import React, { useState } from "react";
+import personService from '../servicers/persons'
 
-const PersonForm = ({persons, setPersons, newName, setNewName, newNumber, setNewNumber}) => {
+const PersonForm = ({ persons, setPersons, message, setMessage }) => {
+    const [newName, setNewName] = useState('')
+    const [newNumber, setNewNumber] = useState('')
+
     const addPerson = (event) => {
         event.preventDefault()
 
         let flag = false
-        persons.forEach((person) => {
-            if (person.name === newName) { return flag = true }
+        let person
+        persons.forEach((p) => {
+            if (p.name === newName) {
+                person = p
+                return flag = true
+            }
         })
-        if (flag) {
-            window.alert(`${newName} is already added to phonebook`)
+        if (flag) {//name相同，修改number
+            person = { ...person, number: newNumber }
+            personService
+                .update(person.id, person)
+                .then(returnPerson => {
+                    setPersons(persons.map(p => p.id !== person.id ? p : returnPerson))
+                })
+                .catch(error => {
+                    setMessage(`Information of ${newName} has already been removed from server`)
+                    setTimeout(() => {
+                        setMessage(null)
+                    }, 3000)
+                })
         }
         else {
             const newPerson = {
                 name: newName,
                 number: newNumber
             }
-            setPersons(persons.concat(newPerson))
+            personService
+                .create(newPerson)
+                .then(returnedPersons => setPersons(persons.concat(returnedPersons)))
         }
         setNewName('')
         setNewNumber('')
+        setMessage(`ADD${newName}`)
+        setTimeout(() => {
+            setMessage(null)
+        }, 3000)
     }
 
     const handleNameChange = (event) => {

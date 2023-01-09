@@ -1,64 +1,49 @@
 import { useState, useEffect} from 'react'
-import axios from "axios"
+import personService from './servicers/persons'
+
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons '
 
+const Notification = ({message}) => {
+  if(message === null) {
+    return null
+  }
+
+  const notification = {
+    background: 'lightgrey',
+    color: 'green',
+    borderRadius: '5px' ,//连字符用小驼峰
+    padding: '10px',
+    border: 'green 3px solid'
+  }
+  
+  return (
+    <div style={notification}>
+      {message}
+    </div>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([])
-  const [newName, setNewName] = useState('')
-  const [newNumber, setNewNumber] = useState('')
+  const [message, setMessage] = useState(null)
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data)
-      })
+    personService
+      .getAll()
+      .then(initialPersons => setPersons(initialPersons))
   },[])
-  // const addPerson = (event) => {
-  //   event.preventDefault()
-
-  //   let flag = false
-  //   persons.forEach((person) => {
-  //     if (person.name === newName) { return flag = true }
-  //   })
-  //   if(flag) {
-  //     window.alert(`${newName} is already added to phonebook`)
-  //   }
-  //   else {
-  //     const newPerson = {
-  //       name: newName,
-  //       number: newNumber
-  //     }
-  //     setPersons(persons.concat(newPerson))
-  //   }
-  //   setNewName('')
-  // }
-
-  // const handleNameChange = (event) => {
-  //   setNewName(event.target.value)
-  // }
-  // const handleNumberChange = (event) => {
-  //   setNewNumber(event.target.value)
-  // }
-  // const filterPerson = (event) => {
-  //   const copyPerson = persons.filter((person) => {
-  //     console.log('person.name', person.name)
-  //     return person.name === event.target.value
-  //   })
-  //   setPersons(copyPerson)
-  //   console.log('copyPerson', copyPerson)
-  // }
-
+  
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message}/>
       <Filter persons={persons} setPersons={setPersons} />
       <h3>add a new</h3>
-      <PersonForm persons={persons} setPersons={setPersons} newName={newName} setNewName={setNewName} newNumber={newNumber} setNewNumber={setNewNumber} />
+      <PersonForm persons={persons} setPersons={setPersons} message={message} setMessage={setMessage}/>
       <h3>Numbers</h3>
-      <Persons persons = {persons}/>
+      <Persons persons = {persons} setPersons={setPersons}/>
     </div>
   )
 }

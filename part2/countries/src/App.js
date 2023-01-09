@@ -5,6 +5,7 @@ const App = () => {
   const [countries, setCountries] = useState([])
 
   const filterCountries = (event) => {
+    event.preventDefault()
     axios
       .get('https://restcountries.com/v3.1/all')
       .then(response => {
